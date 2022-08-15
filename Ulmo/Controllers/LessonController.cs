@@ -29,7 +29,7 @@ namespace StudioReservationAPP.Controllers
         [HttpGet("")]
         public async Task<ActionResult<IEnumerable<LessonDto>>> GetAllLessons()
         {
-            var Lessons = await _LessonService.GetAllLessons();
+            var Lessons =  _LessonService.GetAllLessons();
             var LessonResources = _mapper.Map<IEnumerable<Lesson>, IEnumerable<LessonDto>>(Lessons);
 
             return Ok(LessonResources);
@@ -37,7 +37,7 @@ namespace StudioReservationAPP.Controllers
         [HttpGet("GetAllLessons")]
         public async Task<ActionResult<IEnumerable<LessonDto>>> GetAllLessones()
         {
-            var Lessons = await _LessonService.GetAllLessons();
+            var Lessons =  _LessonService.GetAllLessons();
             var LessonLocations = Lessons.ToList();
             LessonLocations= (List<Lesson>)LessonLocations.OrderByDescending(x => x.StartDate);
 

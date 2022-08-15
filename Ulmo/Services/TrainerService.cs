@@ -29,9 +29,9 @@ namespace StudioReservationAPP.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task<IEnumerable<Trainer>> GetAllTrainers()
+        public IQueryable<Trainer> GetAllTrainers()
         {
-            return await _unitOfWork.Trainers.GetAllAsync();
+            return _unitOfWork.Trainers.GetAllAsync();
         }
 
         public async Task<Trainer> GetTrainerById(int id)

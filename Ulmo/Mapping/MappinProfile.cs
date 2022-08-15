@@ -13,7 +13,7 @@ namespace API.Mapping
             CreateMap<Member, MemberDto>();
 
             CreateMap<Class, ClassDto>();
-
+            CreateMap<Lesson, LessonDto>();
             CreateMap<Branch, BranchDto>();
             CreateMap<Lesson, LessonDto>();
             CreateMap<Trainer, TrainerDto>();
@@ -36,6 +36,7 @@ namespace API.Mapping
             CreateMap<TrainerWorkPlaceDto, TrainerWorkPlace>();
             CreateMap<MemberLessonDto, MemberLesson>();
             CreateMap<CreateMemberLessonDto, MemberLesson>();
+            CreateMap<CreateMemberLessonDto, MemberLessonDto>();
         }
     }
 }

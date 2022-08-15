@@ -31,7 +31,7 @@ namespace StudioReservationAPP.Services
 
         public async Task<IEnumerable<TrainerWorkPlace>> GetAllTrainerWorkPlaces()
         {
-            return await _unitOfWork.TrainerWorkPlaces.GetAllAsync();
+            return  _unitOfWork.TrainerWorkPlaces.GetAllAsync();
         }
 
         public async Task<TrainerWorkPlace> GetTrainerWorkPlaceById(int id)

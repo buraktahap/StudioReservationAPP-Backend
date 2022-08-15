@@ -29,9 +29,9 @@ namespace StudioReservationAPP.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task<IEnumerable<MemberLesson>> GetAllMemberLessons()
+        public IQueryable<MemberLesson> GetAllMemberLessons()
         {
-            return await _unitOfWork.MemberLessons.GetAllAsync();
+            return _unitOfWork.MemberLessons.GetAllAsync().Include(x=>x.Lesson);
         }
 
         public async Task<MemberLesson> GetMemberLessonById(int id)

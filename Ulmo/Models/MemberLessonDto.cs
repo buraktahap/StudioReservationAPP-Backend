@@ -11,8 +11,8 @@ namespace StudioReservationAPP.Models
         public bool? isCompleted { get; set; }
         public int? memberId { get; set; }
         public int? lessonId { get; set; }
-
-        public virtual LessonDto Lesson { get; set; }
+        public virtual Member Member { get; set; }
+        public virtual Lesson Lesson { get; set; }
 
 
     }

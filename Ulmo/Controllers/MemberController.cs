@@ -29,7 +29,7 @@ namespace StudioReservationAPP.Controllers
             [HttpGet("")]
             public async Task<ActionResult<IEnumerable<MemberDto>>> GetAllMembers()
             {
-                var Members = await _MemberService.GetAllMembers();
+                var Members =  _MemberService.GetAllMembers();
                 var MemberResources = _mapper.Map<IEnumerable<Member>, IEnumerable<MemberDto>>(Members);
 
                 return Ok(MemberResources);

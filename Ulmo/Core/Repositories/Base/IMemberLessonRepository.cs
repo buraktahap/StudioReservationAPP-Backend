@@ -5,7 +5,7 @@ namespace StudioReservationAPP.Core.Repositories.Base
 {
     public interface IMemberLessonRepository : IRepository<MemberLesson>
     {
-        Task<IEnumerable<MemberLesson>> GetAllWithMemberLessonsAsync();
+        IQueryable<MemberLesson> GetAllWithMemberLessonsAsync();
         Task<MemberLesson> GetWithMemberLessonByIdAsync(int id);
         Task<MemberLesson> GetWithMemberLessonByMemberIdAsync(int id);
         Task<MemberLesson> GetWithMemberLessonByLessonIdAsync(int id);

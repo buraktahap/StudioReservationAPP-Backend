@@ -27,17 +27,17 @@ namespace StudioReservationAPP.Controllers
         }
 
         [HttpGet("")]
-        public async Task<ActionResult<IEnumerable<BranchDto>>> GetAllBranchs()
+        public IQueryable<BranchDto> GetAllBranchs()
         {
-            var Branchs = await _BranchService.GetAllBranchs();
-            var BranchResources = _mapper.Map<IEnumerable<Branch>, IEnumerable<BranchDto>>(Branchs);
+            var Branchs =  _BranchService.GetAllBranchs();
+            var BranchResources = _mapper.Map<Branch,BranchDto>((Branch)Branchs);
 
-            return Ok(BranchResources);
+            return (IQueryable<BranchDto>)Ok(BranchResources);
         }
         [HttpGet("GetAllBranches")]
         public async Task<ActionResult<IEnumerable<BranchDto>>> GetAllBranches()
         {
-            var Branchs = await _BranchService.GetAllBranchs();
+            var Branchs =  _BranchService.GetAllBranchs();
             var BranchLocations = Branchs.ToList();
 
             return Ok(BranchLocations);

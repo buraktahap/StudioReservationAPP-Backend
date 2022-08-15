@@ -29,9 +29,9 @@ namespace StudioReservationAPP.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task<IEnumerable<Member>> GetAllMembers()
+        public  IQueryable<Member> GetAllMembers()
         {
-            return await _unitOfWork.Members.GetAllAsync();
+            return  _unitOfWork.Members.GetAllAsync();
         }
 
         public async Task<Member> GetMemberById(int id)

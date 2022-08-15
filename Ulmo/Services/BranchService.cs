@@ -29,9 +29,9 @@ namespace StudioReservationAPP.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task<IEnumerable<Branch>> GetAllBranchs()
+        public IQueryable<Branch> GetAllBranchs()
         {
-            return await _unitOfWork.Branches.GetAllAsync();
+            return  _unitOfWork.Branches.GetAllAsync();
         }
 
         public async Task<Branch> GetBranchById(int id)

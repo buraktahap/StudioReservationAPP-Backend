@@ -5,7 +5,7 @@ namespace StudioReservationAPP.Services
 {
     public interface IMemberLessonService
     {
-        Task<IEnumerable<MemberLesson>> GetAllMemberLessons();
+        IQueryable<MemberLesson> GetAllMemberLessons();
         Task<MemberLesson> GetMemberLessonById(int id);
         Task<MemberLesson> GetMemberLessonByMemberId(int id);
         Task<MemberLesson> GetMemberLessonByLessonId(int id);

@@ -5,7 +5,7 @@ namespace StudioReservationAPP.Services
 {
     public interface IMemberService
     {
-        Task<IEnumerable<Member>> GetAllMembers();
+        IQueryable<Member> GetAllMembers();
         Task<Member> GetMemberById(int id);
         Task<Member> CreateMember(Member newMember);
         Task UpdateMember(Member MemberToBeUpdated, Member Member);

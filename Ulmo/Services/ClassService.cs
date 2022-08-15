@@ -31,7 +31,7 @@ namespace StudioReservationAPP.Services
 
         public async Task<IEnumerable<Class>> GetAllClasss()
         {
-            return await _unitOfWork.Classes.GetAllAsync();
+            return  _unitOfWork.Classes.GetAllAsync();
         }
 
         public async Task<Class> GetClassById(int id)

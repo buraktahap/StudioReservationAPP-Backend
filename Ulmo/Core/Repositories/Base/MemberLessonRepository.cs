@@ -13,10 +13,10 @@ namespace StudioReservationAPP.Core.Repositories.Base
             : base(context)
         { }
 
-        public async Task<IEnumerable<MemberLesson>> GetAllWithMemberLessonsAsync()
+        public  IQueryable<MemberLesson> GetAllWithMemberLessonsAsync()
         {
-            return await DbContext.MemberLessons
-                .ToListAsync();
+            return  DbContext.MemberLessons
+                .AsQueryable();
         }
 
         public Task<MemberLesson> GetWithMemberLessonByIdAsync(int id)

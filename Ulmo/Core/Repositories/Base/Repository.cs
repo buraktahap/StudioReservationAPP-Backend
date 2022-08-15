@@ -30,9 +30,9 @@ namespace StudioReservationAPP.Core.Repositories.Base
             return Context.Set<TEntity>().Where(predicate);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public  IQueryable<TEntity> GetAllAsync()
         {
-            return await Context.Set<TEntity>().ToListAsync();
+            return  Context.Set<TEntity>().AsQueryable();
         }
 
         public ValueTask<TEntity> GetByIdAsync(int id)

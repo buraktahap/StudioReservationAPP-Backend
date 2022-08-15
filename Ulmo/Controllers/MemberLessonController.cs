@@ -33,16 +33,15 @@ namespace StudioReservationAPP.Controllers
         [HttpGet("")]
         public async Task<ActionResult<MemberLessonDto>> GetAllMemberLessons()
         {
-            var MemberLesson1 = await _MemberLessonService.GetAllMemberLessons();
-            var query = from ml in _context.MemberLessons join l in _context.Lessons on ml.LessonId equals l.Id into grouping select new { ml, grouping };
-            query.ToList();
+            var memberLesson =  _MemberLessonService.GetAllMemberLessons();
+            
 
-            return Ok(query);
+            return Ok(memberLesson);
         }
         [HttpGet("GetAllMemberLessons")]
         public async Task<ActionResult<IEnumerable<MemberLessonDto>>> GetAllMemberLessones()
         {
-            var MemberLessons = await _MemberLessonService.GetAllMemberLessons();
+            var MemberLessons =  _MemberLessonService.GetAllMemberLessons();
             var MemberLessonLocations = MemberLessons.ToList();
 
             return Ok(MemberLessonLocations);
@@ -131,24 +130,27 @@ namespace StudioReservationAPP.Controllers
         {
             try
             {
+
+                var memberLessons = _context.MemberLessons.AsQueryable()
+                    .Where(ml => ml.MemberId == id && ml.isEnrolled == true && ml.Lesson.StartDate >= DateTime.Now)
+                    .OrderBy(x => x.Lesson.StartDate);
+                //var memberlessons = _context.MemberLessons.AsQueryable().Where(ml => ml.MemberId == id && ml.isEnrolled == true && ml.Lesson.StartDate >= DateTime.Now);
+                     
+
                 
-                var MemberLessons = _context.MemberLessons
-                    .Where(ml => ml.Member!.Id == id && ml.isEnrolled== true && ml.Lesson.StartDate >= DateTime.Now)
-                    .AsQueryable()
-                    .OrderBy(x => x.Lesson.StartDate)
-                    .ToList();
-                List<LessonDto> reservationLessonList = new List<LessonDto> ();
-                foreach(MemberLesson i in MemberLessons)
+                if (memberLessons == null)
+                {
+                    return NotFound("There is nothing to checkin");
+                }
+                else
+                {foreach (MemberLesson i in memberLessons)
                 {
                     var lesson = await _lessonService.GetLessonById(i.LessonId);
-                    var mappedLesson = _mapper.Map<Lesson, LessonDto>(lesson);
-                        reservationLessonList.Add(mappedLesson);
+                    i.Lesson = lesson;
+                }
+                    return Ok(memberLessons);
                 }
 
-                if (reservationLessonList != null)
-                {
-                    return Ok(reservationLessonList.OrderBy(x=> x.StartDate));
-                }
                 return NotFound("There is no active reservation.");
 
             }
@@ -166,9 +168,9 @@ namespace StudioReservationAPP.Controllers
 
                 var memberLessons = _context.MemberLessons
                     .Where(ml => ml.MemberId == id && ml.isEnrolled == true  && ml.Lesson.StartDate >= DateTime.Now)
-                    .AsQueryable()
                     .OrderBy(x => x.Lesson.StartDate)
                     .FirstOrDefault();
+               
                 //List<LessonDto> reservationLessonList = new List<LessonDto>();
                 //foreach (MemberLesson i in MemberLessons)
                 //{
@@ -177,13 +179,12 @@ namespace StudioReservationAPP.Controllers
                 //    reservationLessonList.Add(mappedLesson);
                 //}
                 //var checkInLesson = reservationLessonList.OrderBy(x => x.StartDate).Where(q=>q.IsCheckIn!=true).First();
-
-                var checkInEnrollment = _mapper.Map<MemberLesson, MemberLessonDto>(memberLessons);
-                if (checkInEnrollment == null)
+                if (memberLessons == null)
                 {
                     return NotFound("There is nothing to checkin");
-                }else { 
-                    return Ok(checkInEnrollment);
+                }else {  
+                    memberLessons.Lesson= _context.Lessons.FirstOrDefault(x=>x.Id==memberLessons.LessonId);
+                    return Ok(memberLessons);
                 }
 
                 return NotFound("There is no active reservation.");
@@ -195,11 +196,11 @@ namespace StudioReservationAPP.Controllers
             }
         }
         [HttpPost("CheckIn")]
-        public async Task<ActionResult<MemberLessonDto>> CheckIn([FromBody] MemberLessonDto memberLesson)
+        public async Task<ActionResult<MemberLessonDto>> CheckIn(int memberId, int lessonId)
         {
             try
             {
-                var lessonToCheckIn = _context.MemberLessons.Where(ml => ml.Lesson.Id == memberLesson.lessonId && ml.Member.Id == memberLesson.memberId).FirstOrDefault();
+                var lessonToCheckIn = _context.MemberLessons.Where(ml => ml.LessonId == lessonId && ml.MemberId == memberId).FirstOrDefault();
                 lessonToCheckIn.isCheckin = true;
                 await _context.SaveChangesAsync();
                 return Ok("CheckIn is completed!");
@@ -267,8 +268,9 @@ namespace StudioReservationAPP.Controllers
                 createMemberLessonDto.lesson = Lesson;
                 createMemberLessonDto.member = Member;
                 createMemberLessonDto.isEnrolled = true;
-                var MemberLessonToCreate = _mapper.Map<CreateMemberLessonDto, MemberLesson>(createMemberLessonDto);
 
+                var MemberLessonToCreate = _mapper.Map<CreateMemberLessonDto, MemberLesson>(createMemberLessonDto);
+                MemberLessonToCreate.isCheckin = false;
                 var newMemberLesson = await _MemberLessonService.CreateMemberLesson(MemberLessonToCreate);
                 var updatedMemberLessonResource = _mapper.Map<MemberLesson, MemberLessonDto>(newMemberLesson);
                 await _context.SaveChangesAsync();
