@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudioReservationAPP.Core.EFContext;
 using StudioReservationAPP.Core.Entities;
 using StudioReservationAPP.Models;
@@ -11,7 +12,7 @@ namespace StudioReservationAPP.Controllers
 {
 
 
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class LessonsController : ControllerBase
     {
@@ -26,16 +27,16 @@ namespace StudioReservationAPP.Controllers
             this._context = context;
         }
 
-        [HttpGet("")]
-        public async Task<ActionResult<IEnumerable<LessonDto>>> GetAllLessons()
-        {
-            var Lessons =  _LessonService.GetAllLessons();
-            var LessonResources = _mapper.Map<IEnumerable<Lesson>, IEnumerable<LessonDto>>(Lessons);
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<LessonDto>>> GetAllLessons()
+        //{
+        //    var Lessons =  _LessonService.GetAllLessons();
+        //    var LessonResources = _mapper.Map<IEnumerable<Lesson>, IEnumerable<LessonDto>>(Lessons);
 
-            return Ok(LessonResources);
-        }
-        [HttpGet("GetAllLessons")]
-        public async Task<ActionResult<IEnumerable<LessonDto>>> GetAllLessones()
+        //    return Ok(LessonResources);
+        //}
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<LessonDto>>> GetAllLessons()
         {
             var Lessons =  _LessonService.GetAllLessons();
             var LessonLocations = Lessons.ToList();
@@ -44,7 +45,7 @@ namespace StudioReservationAPP.Controllers
             return Ok(LessonLocations);
         }
 
-        [HttpGet("GetLessonById")]
+        [HttpGet]
         public async Task<ActionResult<LessonDto>> GetLessonById(int id)
         {
             var Lesson = await _LessonService.GetLessonById(id);
@@ -52,20 +53,33 @@ namespace StudioReservationAPP.Controllers
             return Ok(LessonResource);
         }
 
-        [HttpGet("LessonsByBranchName")]
-        public async Task<ActionResult<LessonDto>> GetLessonsByBranchName(String branchName)
+        [HttpPost]
+        public async Task<ActionResult<LessonDto>> GetLessonsByBranchName(int memberId,string branchName)
         {
-            
             try
             {   
-                var lesson =  _context.Lessons.Where(m => m.Classes.Branch.Name== branchName&& m.StartDate >= DateTime.Now).AsEnumerable();
-                var lessons = lesson.ToList();
-                var sortedLessons = lesson.OrderByDescending(x => x.StartDate);
-                if (sortedLessons is null)
+                var lessons = _context.Lessons
+                    .Include(i => i.MemberLessons).ThenInclude(i => i.Member)
+                    .Where(m => m.Classes.Branch.Name == branchName && m.StartDate >= DateTime.Now)
+                    .OrderBy(x => x.StartDate)
+                    .Select(p => new LessonDto
+                    {
+                        IsEnrolled = p.MemberLessons.Any(r => r.MemberId == memberId&& r.isEnrolled==true),
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        EstimatedTime = p.EstimatedTime,
+                        LessonLevel = p.LessonLevel,
+                        LessonType = p.LessonType,  
+                        Quota = p.Quota,
+                        StartDate = p.StartDate,
+                    }).ToList();
+                
+                if (lessons.Count == 0)
                 {
                     return NotFound("There is no active lesson on thi");
                 }
-                return Ok(sortedLessons);
+                return Ok(lessons);
 
             }
             catch (Exception e)
@@ -121,13 +135,13 @@ namespace StudioReservationAPP.Controllers
 
         //    return Ok(updatedLessonResource);
         //}
-        [HttpPost("{Description}")]
-        public async Task<ActionResult<LessonDto>> UpdateLesson(int Id, string Description, [FromBody] LessonDto Lesson)
+        [HttpPost]
+        public async Task<ActionResult<LessonDto>> UpdateLesson(LessonDto lessonDto)
         {
             try
             {
-                var lesson = await _LessonService.GetLessonById(Id);
-                lesson.Description = Description;
+                var lesson = await _LessonService.GetLessonById(lessonDto.Id);
+                lesson.Description = lessonDto.Description;
                 await _context.SaveChangesAsync();
                 return Ok(lesson);
 

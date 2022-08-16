@@ -13,7 +13,11 @@ namespace StudioReservationAPP.Models
         public DateTime StartDate { get; set; }
         public DateTime EstimatedTime { get; set; }
         public int TrainerId { get; set; }
+        public Trainer Trainer { get; set; }
+        public virtual ICollection<MemberLesson> MemberLessons { get; set; }
         //public List<MemberLesson>? EnrollmentTable { get; set; } = new List<MemberLesson>();
         public int ClassesId { get; set; }
+        public Class Classes { get; set; }
+        public bool IsEnrolled { get; internal set; }
     }
 }

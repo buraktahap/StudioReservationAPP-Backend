@@ -8,8 +8,8 @@ namespace StudioReservationAPP.Core.Entities
     {
         public bool? isEnrolled { get; set; }
         public int? EnrollCount { get; set; }
-        public bool? isCheckin { get; set; }
-        public bool? isCompleted { get; set; }
+        public bool isCheckin { get; set; } = false;
+        public bool isCompleted { get; set; } = false;
 
         public int MemberId { get; set; }
         public virtual  Member? Member { get; set; }

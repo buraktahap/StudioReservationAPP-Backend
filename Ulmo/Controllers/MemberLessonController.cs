@@ -125,6 +125,37 @@ namespace StudioReservationAPP.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpGet("LessonsByBranchName")]
+        public async Task<ActionResult<MemberLessonDto>> GetLessonsByBranchName(String branchName)
+        {
+
+            try
+            {
+                var memberLesson = _context.MemberLessons.Where(m => m.Lesson.Classes.Branch.Name == branchName && m.Lesson.StartDate >= DateTime.Now).AsQueryable();
+                var sortedLessons = memberLesson.OrderBy(x => x.Lesson.StartDate);
+                if (sortedLessons == null)
+                {
+                    return NotFound("There is nothing to checkin");
+                }
+                else
+                {foreach (MemberLesson i in sortedLessons)
+                {
+                    var lesson = await _lessonService.GetLessonById(i.LessonId);
+                    i.Lesson = lesson;
+                }
+                    return Ok(sortedLessons);
+                }
+
+                return NotFound("There is no active reservation.");
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet("ReservationList")]
         public async Task<ActionResult<MemberLessonDto>> ReservationList(int id)
         {
@@ -231,7 +262,7 @@ namespace StudioReservationAPP.Controllers
             }
         }
 
-        [HttpGet("MemberLessonsByBranchName")]
+        [HttpGet("MemberLessonsByLessonName")]
         public async Task<ActionResult<MemberLessonDto>> GetMemberLessonsByLessonName(string lessonName)
         {
             try
@@ -257,26 +288,23 @@ namespace StudioReservationAPP.Controllers
         {
             try
             {
-                var memberLesson = _context.MemberLessons.Where(ml => ml.LessonId == Enroll.LessonId && ml.MemberId == Enroll.MemberId).FirstOrDefault();
-                if (memberLesson != null)
-                {
-                    return NotFound(memberLesson);
-                }
-                var Member = _context.Members.Where(m => m.Id == Enroll.MemberId).FirstOrDefault();
-                var Lesson = _context.Lessons.Where(m => m.Id == Enroll.LessonId).FirstOrDefault();
-                var createMemberLessonDto = new CreateMemberLessonDto();
-                createMemberLessonDto.lesson = Lesson;
-                createMemberLessonDto.member = Member;
-                createMemberLessonDto.isEnrolled = true;
+                
+                    var Member = _context.Members.Where(m => m.Id == Enroll.MemberId).FirstOrDefault();
+                    var Lesson = _context.Lessons.Where(m => m.Id == Enroll.LessonId).FirstOrDefault();
+                    var createMemberLessonDto = new CreateMemberLessonDto();
+                    createMemberLessonDto.lesson = Lesson;
+                    createMemberLessonDto.member = Member;
+                    createMemberLessonDto.isEnrolled = true;
 
-                var MemberLessonToCreate = _mapper.Map<CreateMemberLessonDto, MemberLesson>(createMemberLessonDto);
-                MemberLessonToCreate.isCheckin = false;
-                var newMemberLesson = await _MemberLessonService.CreateMemberLesson(MemberLessonToCreate);
-                var updatedMemberLessonResource = _mapper.Map<MemberLesson, MemberLessonDto>(newMemberLesson);
-                await _context.SaveChangesAsync();
+                    var MemberLessonToCreate = _mapper.Map<CreateMemberLessonDto, MemberLesson>(createMemberLessonDto);
+                    MemberLessonToCreate.isCheckin = false;
+                    var newMemberLesson = await _MemberLessonService.CreateMemberLesson(MemberLessonToCreate);
+                    var updatedMemberLessonResource = _mapper.Map<MemberLesson, MemberLessonDto>(newMemberLesson);
+                    await _context.SaveChangesAsync();
 
 
-                return Ok(updatedMemberLessonResource);
+                    return Ok(updatedMemberLessonResource);
+                
             }
             catch (Exception e)
             {
