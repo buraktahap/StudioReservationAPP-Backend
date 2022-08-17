@@ -243,11 +243,11 @@ namespace StudioReservationAPP.Controllers
         }
 
         [HttpPost("EnrollCancel")]
-        public async Task<ActionResult<MemberLessonDto>> EnrollCancel([FromBody] MemberLessonDto memberLesson)
+        public async Task<ActionResult<MemberLessonDto>> EnrollCancel([FromBody] EnrollCancelMemberLessonDto enrollCancelMemberLessonDto)
         {
             try
             {
-                var lessonToCheckIn = _context.MemberLessons.Where(ml => ml.Lesson.Id == memberLesson.lessonId && ml.Member.Id == memberLesson.memberId).FirstOrDefault();
+                var lessonToCheckIn = _context.MemberLessons.Where(ml => ml.Lesson.Id == enrollCancelMemberLessonDto.lessonId && ml.Member.Id == enrollCancelMemberLessonDto.memberId).FirstOrDefault();
                 if (lessonToCheckIn != null)
                 {
                     await _MemberLessonService.DeleteMemberLesson(lessonToCheckIn);
