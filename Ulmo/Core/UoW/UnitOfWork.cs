@@ -15,19 +15,21 @@ namespace StudioReservationAPP.Core.UoW
         private TrainerRepository _trainerRepository;
         private TrainerWorkPlaceRepository _trainerWorkPlaceRepository;
         private MemberLessonRepository _memberLessonRepository;
+        private WaitingQueueRepository _waitingQueueRepository;
 
         public UnitOfWork(DatabaseContext context)
         {
             _context = context;
         }
 
-        public IMemberRepository Members => _memberRepository = _memberRepository ?? new MemberRepository(_context);
-        public IBranchRepository Branches => _branchRepository = _branchRepository ?? new BranchRepository(_context);
-        public IClassRepository Classes => _classRepository = _classRepository ?? new ClassRepository(_context);
-        public ILessonRepository Lessons => _lessonRepository = _lessonRepository ?? new LessonRepository(_context);
-        public ITrainerRepository Trainers => _trainerRepository = _trainerRepository ?? new TrainerRepository(_context);
-        public ITrainerWorkPlaceRepository TrainerWorkPlaces => _trainerWorkPlaceRepository = _trainerWorkPlaceRepository ?? new TrainerWorkPlaceRepository(_context);
-        public IMemberLessonRepository MemberLessons => _memberLessonRepository = _memberLessonRepository ?? new MemberLessonRepository(_context);
+        public IMemberRepository Members => _memberRepository ??= new MemberRepository(_context);
+        public IBranchRepository Branches => _branchRepository ??= new BranchRepository(_context);
+        public IClassRepository Classes => _classRepository ??= new ClassRepository(_context);
+        public ILessonRepository Lessons => _lessonRepository ??= new LessonRepository(_context);
+        public ITrainerRepository Trainers => _trainerRepository ??= new TrainerRepository(_context);
+        public ITrainerWorkPlaceRepository TrainerWorkPlaces => _trainerWorkPlaceRepository ??= new TrainerWorkPlaceRepository(_context);
+        public IMemberLessonRepository MemberLessons => _memberLessonRepository ??= new MemberLessonRepository(_context);
+        public IWaitingQueueRepository WaitingQueues => _waitingQueueRepository ??= new WaitingQueueRepository(_context);
 
         public int Commit()
         {

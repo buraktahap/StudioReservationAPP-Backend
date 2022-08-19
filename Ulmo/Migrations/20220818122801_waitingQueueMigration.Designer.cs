@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudioReservationAPP.Core.EFContext;
 
@@ -11,9 +12,10 @@ using StudioReservationAPP.Core.EFContext;
 namespace StudioReservationAPP.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220818122801_waitingQueueMigration")]
+    partial class waitingQueueMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,9 +87,6 @@ namespace StudioReservationAPP.Migrations
                     b.Property<int>("EnrollCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("EnrollQuota")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("EstimatedTime")
                         .HasColumnType("datetime2");
 
@@ -101,6 +100,9 @@ namespace StudioReservationAPP.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Quota")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -108,9 +110,6 @@ namespace StudioReservationAPP.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("WaitingQueueCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WaitingQueueQuota")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

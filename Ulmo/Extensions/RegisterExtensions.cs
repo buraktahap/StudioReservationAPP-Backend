@@ -35,6 +35,7 @@ namespace StudioReservationAPP.Extensions
             services.AddTransient(typeof(ITrainerService), typeof(TrainerService));
             services.AddTransient(typeof(ITrainerWorkPlaceService), typeof(TrainerWorkPlaceService));
             services.AddTransient(typeof(IMemberLessonService), typeof(MemberLessonService));
+            services.AddTransient(typeof(IWaitingQueueService), typeof(WaitingQueueService));
             services.AddTransient<IContextFactory, ContextFactory>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

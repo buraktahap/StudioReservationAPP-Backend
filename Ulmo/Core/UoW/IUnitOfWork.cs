@@ -18,6 +18,7 @@ namespace StudioReservationAPP.Core.UoW
         ITrainerRepository Trainers { get; }
         ITrainerWorkPlaceRepository TrainerWorkPlaces { get; }
         IMemberLessonRepository MemberLessons { get; }
+        IWaitingQueueRepository WaitingQueues { get; }
 
         //IRepository<TEntity> GetRepository<TEntity>() where TEntity : class;
         //IRepository<TEntity, string> GetRepositoryWithString<TEntity>() where TEntity : Entity<string>;

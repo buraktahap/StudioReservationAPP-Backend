@@ -9,7 +9,10 @@ namespace StudioReservationAPP.Models
         public Core.Entities.Enums.LessonType LessonType { get; set; }
         public Core.Entities.Enums.LessonLevel LessonLevel { get; set; }
         public string? Description { get; set; }
-        public int Quota { get; set; }
+        public int EnrollQuota { get; set; }
+        public int WaitingQueueQuota { get; set; }
+        public int EnrollCount { get; set; } 
+        public int WaitingQueueCount { get; set; } 
         public DateTime StartDate { get; set; }
         public DateTime EstimatedTime { get; set; }
         public int TrainerId { get; set; }

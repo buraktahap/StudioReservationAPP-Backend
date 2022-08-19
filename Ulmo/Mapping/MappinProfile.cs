@@ -20,16 +20,13 @@ namespace API.Mapping
             CreateMap<TrainerWorkPlace, TrainerWorkPlaceDto>();
             CreateMap<MemberLesson,MemberLessonDto>();
             CreateMap<MemberLesson,CreateMemberLessonDto>();
-
+            CreateMap<WaitingQueue, WaitingQueueDto>();
+            CreateMap<WaitingQueue, CreateWaitingQueueDto>();
             // Resource to Domain
             CreateMap<MemberDto, Member>();
-
             CreateMap<SaveMemberDto, Member>();
-
             CreateMap<CreateMemberDto, Member>();
-
             CreateMap<BranchDto, Branch>();
-
             CreateMap<ClassDto, Class>();
             CreateMap<LessonDto, Lesson>();
             CreateMap<TrainerDto, Trainer>();
@@ -37,6 +34,8 @@ namespace API.Mapping
             CreateMap<MemberLessonDto, MemberLesson>();
             CreateMap<CreateMemberLessonDto, MemberLesson>();
             CreateMap<CreateMemberLessonDto, MemberLessonDto>();
+            CreateMap<WaitingQueueDto, WaitingQueue>();
+            CreateMap<CreateWaitingQueueDto, WaitingQueue>();
         }
     }
 }

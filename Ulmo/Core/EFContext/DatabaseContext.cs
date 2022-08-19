@@ -21,6 +21,7 @@ namespace StudioReservationAPP.Core.EFContext
         public DbSet<MemberLesson> MemberLessons { get; set; }
         public DbSet<Trainer> Trainers { get; set; }
         public DbSet<TrainerWorkPlace> TrainerWorkPlaces { get; set; }
+        public DbSet<WaitingQueue> WaitingQueues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +50,20 @@ namespace StudioReservationAPP.Core.EFContext
                 .WithMany(l => l.MemberLessons)
                 .HasForeignKey(ml => ml.LessonId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WaitingQueue>()
+                .HasKey(wq=> new { wq.MemberId, wq.LessonId });
+            modelBuilder.Entity<WaitingQueue>()
+                .HasOne(wq => wq.Member)
+                .WithOne(m => m.WaitingQueue)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<WaitingQueue>()
+                .HasOne(l => l.Lesson)
+                .WithMany(wq=> wq.WaitingQueues)
+                .HasForeignKey(wq=>wq.LessonId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
         }
     }
 }

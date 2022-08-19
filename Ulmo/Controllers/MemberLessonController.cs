@@ -18,16 +18,18 @@ namespace StudioReservationAPP.Controllers
         private readonly IMemberLessonService _MemberLessonService;
         private readonly ILessonService _lessonService;
         private readonly IMapper _mapper;
+        private readonly IWaitingQueueService _WaitingQueueService;
         private readonly DatabaseContext _context;
 
         public int MemberLessons { get; private set; }
 
-        public MemberLessonsController(IMemberLessonService MemberLessonService,ILessonService LessonService, IMapper mapper, DatabaseContext context)
+        public MemberLessonsController(IMemberLessonService MemberLessonService,ILessonService LessonService, IMapper mapper, DatabaseContext context, IWaitingQueueService waitingQueueService)
         {
             _mapper = mapper;
             _MemberLessonService = MemberLessonService;
             _lessonService = LessonService;
             _context = context;
+            _WaitingQueueService = waitingQueueService;
         }
 
         [HttpGet("")]
@@ -163,7 +165,7 @@ namespace StudioReservationAPP.Controllers
             {
 
                 var memberLessons = _context.MemberLessons.AsQueryable()
-                    .Where(ml => ml.MemberId == id && ml.isEnrolled == true && ml.Lesson.StartDate >= DateTime.Now)
+                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true && ml.Lesson.StartDate >= DateTime.Now)
                     .OrderBy(x => x.Lesson.StartDate);
                 //var memberlessons = _context.MemberLessons.AsQueryable().Where(ml => ml.MemberId == id && ml.isEnrolled == true && ml.Lesson.StartDate >= DateTime.Now);
                      
@@ -198,7 +200,7 @@ namespace StudioReservationAPP.Controllers
             {
 
                 var memberLessons = _context.MemberLessons
-                    .Where(ml => ml.MemberId == id && ml.isEnrolled == true  && ml.Lesson.StartDate >= DateTime.Now)
+                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true  && ml.Lesson.StartDate >= DateTime.Now)
                     .OrderBy(x => x.Lesson.StartDate)
                     .FirstOrDefault();
                
@@ -232,7 +234,7 @@ namespace StudioReservationAPP.Controllers
             try
             {
                 var lessonToCheckIn = _context.MemberLessons.Where(ml => ml.LessonId == lessonId && ml.MemberId == memberId).FirstOrDefault();
-                lessonToCheckIn.isCheckin = true;
+                lessonToCheckIn.IsCheckin = true;
                 await _context.SaveChangesAsync();
                 return Ok("CheckIn is completed!");
             }
@@ -251,6 +253,20 @@ namespace StudioReservationAPP.Controllers
                 if (lessonToCheckIn != null)
                 {
                     await _MemberLessonService.DeleteMemberLesson(lessonToCheckIn);
+                    var lesson = await _lessonService.GetLessonById(lessonToCheckIn.LessonId);
+                    lesson.EnrollCount--;
+                    if (lesson.WaitingQueueCount > 0)
+                    {
+                        var waitingQueueObject = _context.WaitingQueues.Where(x => x.LessonId == lessonToCheckIn.LessonId).OrderBy(q => q.QueueEnrollTime).FirstOrDefault();
+                        var memberLesson = new MemberLessonEnrollDto
+                        {
+                            LessonId = waitingQueueObject.LessonId,
+                            MemberId = waitingQueueObject.MemberId
+                        };
+                        await Enroll(memberLesson);
+                        lesson.EnrollCount++;
+                        lesson.WaitingQueueCount--;
+                    }
                     await _context.SaveChangesAsync();
                     return Ok("Enroll Canceled");
                 }
@@ -284,31 +300,88 @@ namespace StudioReservationAPP.Controllers
 
 
         [HttpPost("Enroll")]
-        public async Task<ActionResult<MemberLessonDto>> CreateMemberLesson([FromBody] MemberLessonEnrollDto Enroll)
+        public async Task<ActionResult<MemberLessonDto>> Enroll([FromBody] MemberLessonEnrollDto Enroll)
         {
             try
             {
                 
                     var Member = _context.Members.Where(m => m.Id == Enroll.MemberId).FirstOrDefault();
                     var Lesson = _context.Lessons.Where(m => m.Id == Enroll.LessonId).FirstOrDefault();
-                    var createMemberLessonDto = new CreateMemberLessonDto();
-                    createMemberLessonDto.lesson = Lesson;
-                    createMemberLessonDto.member = Member;
-                    createMemberLessonDto.isEnrolled = true;
+                var createMemberLessonDto = new CreateMemberLessonDto
+                {
+                    lesson = Lesson,
+                    member = Member,
+                    isEnrolled = true
+                };
 
-                    var MemberLessonToCreate = _mapper.Map<CreateMemberLessonDto, MemberLesson>(createMemberLessonDto);
-                    MemberLessonToCreate.isCheckin = false;
-                    var newMemberLesson = await _MemberLessonService.CreateMemberLesson(MemberLessonToCreate);
-                    var updatedMemberLessonResource = _mapper.Map<MemberLesson, MemberLessonDto>(newMemberLesson);
-                    await _context.SaveChangesAsync();
+                var MemberLessonToCreate = _mapper.Map<CreateMemberLessonDto, MemberLesson>(createMemberLessonDto);
+                    MemberLessonToCreate.IsCheckin = false;
+                if (Lesson.EnrollCount < Lesson.EnrollQuota) 
+                {
+                     await _MemberLessonService.CreateMemberLesson(MemberLessonToCreate);
+                    Lesson.EnrollCount++;
+                    var updatedMemberLessonResource = _mapper.Map<MemberLesson, MemberLessonDto>(MemberLessonToCreate);
+                
+                }else if(Lesson.EnrollCount == Lesson.EnrollQuota && Lesson.WaitingQueueCount< Lesson.WaitingQueueQuota)
+                {
+                    
+                    var createWaitingQueueObject = new CreateWaitingQueueIdDto
+                    {
+                        LessonId = Lesson.Id,
+                        MemberId= Member.Id,
+                        
+                    };
+                    CreateWaitingQueue(createWaitingQueueObject);
+                    Lesson.WaitingQueueCount++;
+                    
+
+                }
+                else 
+                {
+                    return NotFound("This Lesson is full"); 
+                }
+                
 
 
-                    return Ok(updatedMemberLessonResource);
+                await _context.SaveChangesAsync();
+
+
+                    return Ok("Enroll or waiting queue action is succesfull");
                 
             }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
+            }
+
+        }
+        [HttpPost("AddToWaitingQueue")]
+        public async Task<ActionResult<WaitingQueue>> CreateWaitingQueue([FromBody] CreateWaitingQueueIdDto waitingQueueDto)
+        {
+            try
+            {
+                var createWaitingQueueDto = new CreateWaitingQueueDto
+                {
+                    lesson = _context.Lessons.Where(m => m.Id == waitingQueueDto.LessonId).FirstOrDefault(),
+                    member = _context.Members.Where(m => m.Id == waitingQueueDto.MemberId).FirstOrDefault(),
+                    QueueEnrollTime = DateTime.Now
+                };
+                if (createWaitingQueueDto != null && createWaitingQueueDto.lesson.WaitingQueueCount < 5)
+                {
+                    var waitingQueue = _mapper.Map<CreateWaitingQueueDto, WaitingQueue>(createWaitingQueueDto);
+                    var newWaitingQueue = await _WaitingQueueService.CreateWaitingQueue(waitingQueue);
+                    newWaitingQueue.Lesson.WaitingQueueCount++;
+                    await _context.SaveChangesAsync();
+                    return Ok(newWaitingQueue);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
             }
 
         }

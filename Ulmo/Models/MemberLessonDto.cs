@@ -5,12 +5,12 @@ namespace StudioReservationAPP.Models
     public class MemberLessonDto
     {
         public int id;
-        public bool? isEnrolled { get; set; }
+        public bool? IsEnrolled { get; set; }
         public int? EnrollCount { get; set; }
-        public bool? isCheckin { get; set; }
-        public bool? isCompleted { get; set; }
-        public int? memberId { get; set; }
-        public int? lessonId { get; set; }
+        public bool? IsCheckin { get; set; }
+        public bool? IsCompleted { get; set; }
+        public int? MemberId { get; set; }
+        public int? LessonId { get; set; }
         public virtual Member Member { get; set; }
         public virtual Lesson Lesson { get; set; }
 

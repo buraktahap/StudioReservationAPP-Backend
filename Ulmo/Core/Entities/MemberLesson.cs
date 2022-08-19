@@ -6,10 +6,10 @@ namespace StudioReservationAPP.Core.Entities
     [Table("Enrollments")]
     public class MemberLesson : Entity
     {
-        public bool? isEnrolled { get; set; }
-        public int? EnrollCount { get; set; }
-        public bool isCheckin { get; set; } = false;
-        public bool isCompleted { get; set; } = false;
+        public bool? IsEnrolled { get; set; }
+        //public int? EnrollCount { get; set; }
+        public bool IsCheckin { get; set; } = false;
+        public bool IsCompleted { get; set; } = false;
 
         public int MemberId { get; set; }
         public virtual  Member? Member { get; set; }

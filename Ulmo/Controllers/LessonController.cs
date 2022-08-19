@@ -64,20 +64,23 @@ namespace StudioReservationAPP.Controllers
                     .OrderBy(x => x.StartDate)
                     .Select(p => new LessonDto
                     {
-                        IsEnrolled = p.MemberLessons.Any(r => r.MemberId == memberId&& r.isEnrolled==true),
+                        IsEnrolled = p.MemberLessons.Any(r => r.MemberId == memberId&& r.IsEnrolled==true),
                         Id = p.Id,
                         Name = p.Name,
                         Description = p.Description,
                         EstimatedTime = p.EstimatedTime,
                         LessonLevel = p.LessonLevel,
                         LessonType = p.LessonType,  
-                        Quota = p.Quota,
+                        EnrollQuota = p.EnrollQuota,
                         StartDate = p.StartDate,
+                        EnrollCount = p.EnrollCount,
+                        WaitingQueueCount = p.WaitingQueueCount,
+                        WaitingQueueQuota = p.WaitingQueueQuota,
                     }).ToList();
                 
                 if (lessons.Count == 0)
                 {
-                    return NotFound("There is no active lesson on thi");
+                    return NotFound("There is no active lesson on thiz");
                 }
                 return Ok(lessons);
 

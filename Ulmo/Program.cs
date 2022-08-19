@@ -3,12 +3,6 @@ using StudioReservationAPP.Core.EFContext;
 using StudioReservationAPP.Core.Factory;
 using StudioReservationAPP.Core.Repositories.Base;
 using StudioReservationAPP.Extensions;
-
-
-
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
