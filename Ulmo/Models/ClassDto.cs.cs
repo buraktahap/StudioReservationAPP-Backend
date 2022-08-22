@@ -7,5 +7,6 @@ namespace StudioReservationAPP.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public int BranchId { get; set; }
+        public BranchDto Branch { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudioReservationAPP.Core.EFContext;
 using StudioReservationAPP.Core.Entities;
 using StudioReservationAPP.Models;
@@ -114,6 +115,26 @@ namespace StudioReservationAPP.Controllers
             try
             {
                 var MemberLesson = _context.MemberLessons.Where(ml => ml.Member.Id == id).AsQueryable();
+                var MemberLessons = MemberLesson.ToList();
+                if (MemberLessons is null)
+                {
+                    return NotFound("There is no active MemberLesson on this");
+                }
+                return Ok(MemberLessons);
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("GetMemberLessonsByMemberIdByLessonId")]
+        public async Task<ActionResult<MemberLessonDto>> GetMemberLessonsByMemberIdByLessonId(int memberId,int lessonId)
+        {
+            try
+            {
+                var MemberLesson = _context.MemberLessons.Include(x=>x.Lesson).Where(ml => ml.Member.Id == memberId&& ml.Lesson.Id == lessonId).AsQueryable();
                 var MemberLessons = MemberLesson.ToList();
                 if (MemberLessons is null)
                 {
@@ -369,10 +390,9 @@ namespace StudioReservationAPP.Controllers
                 if (createWaitingQueueDto != null && createWaitingQueueDto.lesson.WaitingQueueCount < 5)
                 {
                     var waitingQueue = _mapper.Map<CreateWaitingQueueDto, WaitingQueue>(createWaitingQueueDto);
-                    var newWaitingQueue = await _WaitingQueueService.CreateWaitingQueue(waitingQueue);
-                    newWaitingQueue.Lesson.WaitingQueueCount++;
+                    waitingQueue.Lesson.WaitingQueueCount++;
                     await _context.SaveChangesAsync();
-                    return Ok(newWaitingQueue);
+                    return Ok(waitingQueue);
                 }
                 else
                 {

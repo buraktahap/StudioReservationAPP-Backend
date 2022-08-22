@@ -48,7 +48,9 @@ namespace StudioReservationAPP.Controllers
         [HttpGet]
         public async Task<ActionResult<LessonDto>> GetLessonById(int id)
         {
-            var Lesson = await _LessonService.GetLessonById(id);
+            var Lesson =  _context.Lessons.Include(x => x.Trainer)
+                .Include(q => q.Classes).ThenInclude(b=>b.Branch)
+                .Where(l => l.Id == id).FirstOrDefault();
             var LessonResource = _mapper.Map<Lesson, LessonDto>(Lesson);
             return Ok(LessonResource);
         }
