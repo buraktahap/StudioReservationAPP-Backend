@@ -4,7 +4,7 @@ namespace StudioReservationAPP.Models
 {
     public class MemberLessonDto
     {
-        public int id;
+        public int Id;
         public bool? IsEnrolled { get; set; }
         public int? EnrollCount { get; set; }
         public bool? IsCheckin { get; set; }
@@ -12,7 +12,7 @@ namespace StudioReservationAPP.Models
         public int? MemberId { get; set; }
         public int? LessonId { get; set; }
         public virtual Member Member { get; set; }
-        public  LessonDto Lesson { get; set; }
+        public  virtual LessonDto Lesson { get; set; }
 
 
     }

@@ -156,11 +156,12 @@ namespace StudioReservationAPP.Controllers
             try
             {
                 var queue = _context.WaitingQueues.Where(x => x.LessonId == lessonId).AsQueryable().ToList();
-                int index=1;
+                int index=0;
                 foreach(WaitingQueue i in queue)
                 {
                     if(i.MemberId == memberId)
                     {
+                        index++;
                         break;
                     }
                     else
