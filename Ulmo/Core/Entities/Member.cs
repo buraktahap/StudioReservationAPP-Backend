@@ -14,7 +14,7 @@ namespace StudioReservationAPP.Core.Entities
 
         public virtual List<MemberLesson>? MemberLessons { get; set; } = new List<MemberLesson>();
 
-        public WaitingQueue? WaitingQueue { get; set; }
+        //public WaitingQueue? WaitingQueue { get; set; }
         public int? SubscriptionsId { get; set; }
 
         public virtual Subscription? Subscriptions { get; set; }

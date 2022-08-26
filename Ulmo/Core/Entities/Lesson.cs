@@ -21,8 +21,7 @@ namespace StudioReservationAPP.Core.Entities
         public Class Classes { get; set; }
         public int EnrollCount { get; set; } = 0;
         public int WaitingQueueCount { get; set; } = 0;
-
-        public virtual ICollection<WaitingQueue> WaitingQueues{ get; set; }
+        public virtual ICollection<WaitingQueue> WaitingQueues { get; set; }
 
         //public Queue<MemberLesson>? WaitingQueue { get; set; }
     }

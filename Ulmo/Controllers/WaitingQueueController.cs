@@ -52,11 +52,10 @@ namespace StudioReservationAPP.Controllers
             var WaitingQueueResource = _mapper.Map<WaitingQueue, WaitingQueueDto>(WaitingQueue);
             return Ok(WaitingQueueResource);
         }
-
         [HttpGet]
         public async Task<ActionResult<WaitingQueueDto>> GetWaitingQueueByLessonId(int lessonId)
         {
-            var WaitingQueue =  _context.WaitingQueues.Where(x=>x.LessonId==lessonId).AsQueryable().ToList();
+            var WaitingQueue = _context.WaitingQueues.Where(x => x.LessonId == lessonId).AsQueryable().ToList();
             return Ok(WaitingQueue);
         }
         [HttpGet]

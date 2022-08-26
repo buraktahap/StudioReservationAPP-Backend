@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudioReservationAPP.Core.EFContext;
 
@@ -11,9 +12,10 @@ using StudioReservationAPP.Core.EFContext;
 namespace StudioReservationAPP.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220826092903_waitingQueueComeBack")]
+    partial class waitingQueueComeBack
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -283,7 +285,9 @@ namespace StudioReservationAPP.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.HasIndex("MemberId");
+                    b.HasIndex("MemberId")
+                        .IsUnique()
+                        .HasFilter("[MemberId] IS NOT NULL");
 
                     b.ToTable("WaitingQueues");
                 });
@@ -376,8 +380,8 @@ namespace StudioReservationAPP.Migrations
                         .HasForeignKey("LessonId");
 
                     b.HasOne("StudioReservationAPP.Core.Entities.Member", "Member")
-                        .WithMany()
-                        .HasForeignKey("MemberId");
+                        .WithOne("WaitingQueue")
+                        .HasForeignKey("StudioReservationAPP.Core.Entities.WaitingQueue", "MemberId");
 
                     b.Navigation("Lesson");
 
@@ -408,6 +412,8 @@ namespace StudioReservationAPP.Migrations
             modelBuilder.Entity("StudioReservationAPP.Core.Entities.Member", b =>
                 {
                     b.Navigation("MemberLessons");
+
+                    b.Navigation("WaitingQueue");
                 });
 
             modelBuilder.Entity("StudioReservationAPP.Core.Entities.Subscription", b =>

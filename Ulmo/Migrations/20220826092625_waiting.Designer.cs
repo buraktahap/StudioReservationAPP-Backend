@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudioReservationAPP.Core.EFContext;
 
@@ -11,9 +12,10 @@ using StudioReservationAPP.Core.EFContext;
 namespace StudioReservationAPP.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220826092625_waiting")]
+    partial class waiting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -262,32 +264,6 @@ namespace StudioReservationAPP.Migrations
                     b.ToTable("TrainerWorkPlaces");
                 });
 
-            modelBuilder.Entity("StudioReservationAPP.Core.Entities.WaitingQueue", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("LessonId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MemberId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("QueueEnrollTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LessonId");
-
-                    b.HasIndex("MemberId");
-
-                    b.ToTable("WaitingQueues");
-                });
-
             modelBuilder.Entity("StudioReservationAPP.Core.Entities.Class", b =>
                 {
                     b.HasOne("StudioReservationAPP.Core.Entities.Branch", "Branch")
@@ -369,21 +345,6 @@ namespace StudioReservationAPP.Migrations
                     b.Navigation("Trainer");
                 });
 
-            modelBuilder.Entity("StudioReservationAPP.Core.Entities.WaitingQueue", b =>
-                {
-                    b.HasOne("StudioReservationAPP.Core.Entities.Lesson", "Lesson")
-                        .WithMany("WaitingQueues")
-                        .HasForeignKey("LessonId");
-
-                    b.HasOne("StudioReservationAPP.Core.Entities.Member", "Member")
-                        .WithMany()
-                        .HasForeignKey("MemberId");
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("Member");
-                });
-
             modelBuilder.Entity("StudioReservationAPP.Core.Entities.Branch", b =>
                 {
                     b.Navigation("Classes");
@@ -401,8 +362,6 @@ namespace StudioReservationAPP.Migrations
             modelBuilder.Entity("StudioReservationAPP.Core.Entities.Lesson", b =>
                 {
                     b.Navigation("MemberLessons");
-
-                    b.Navigation("WaitingQueues");
                 });
 
             modelBuilder.Entity("StudioReservationAPP.Core.Entities.Member", b =>
