@@ -348,19 +348,21 @@ namespace StudioReservationAPP.Controllers
             }
         }
 
-        [HttpGet("GetLastCompletedLesson")]
-        public async Task<ActionResult<MemberLessonDto>> GetLastCompletedLesson(int memberId)
+        [HttpGet("GetCompletedLesson")]
+        public async Task<ActionResult<List<MemberLessonDto>>> GetCompletedLessons(int memberId)
         {
             try
             {
-                var LastCompletedLesson = _context.MemberLessons.Include(p=>p.Lesson).Where(x=> x.MemberId==memberId && x.IsEnrolled == true 
-                && x.IsCheckin == true && x.IsCompleted == true && x.Lesson.StartDate < DateTime.Now )
-                    .ToList().OrderBy(q=> q.Lesson.StartDate).FirstOrDefault();
-                if(LastCompletedLesson == null)
+                var CompletedLessons = _context.MemberLessons.Include(p=>p.Lesson).Where(x=> x.MemberId==memberId && x.IsEnrolled == true 
+                && x.IsCheckin == true && x.Lesson.StartDate < DateTime.Now ).ToList()
+                    .OrderBy(q=> q.Lesson.StartDate);
+                CompletedLessons.ToList().ForEach(q => q.IsCompleted = true);
+                await _context.SaveChangesAsync();
+                if (CompletedLessons == null)
                 {
                     return NotFound("Last Completed Lesson couldn't found");
                 }
-                return Ok(LastCompletedLesson);
+                return Ok(CompletedLessons);
                 
             }
             catch (Exception e)
@@ -368,6 +370,27 @@ namespace StudioReservationAPP.Controllers
                 return BadRequest(e.Message);
             }
         }
+        //TODO
+        //[HttpGet("GetLastCompletedLesson")]
+        //public async Task<ActionResult<MemberLessonDto>> GetLastCompletedLessons(int memberId)
+        //{
+        //    try
+        //    {
+        //        var LastCompletedLessons = GetCompletedLessons(memberId);
+        //        var LastCompletedLesson = LastCompletedLessons.Result.Value.FirstOrDefault();
+                
+        //        if (LastCompletedLesson == null)
+        //        {
+        //            return NotFound("Last Completed Lesson couldn't found");
+        //        }
+        //        return Ok(LastCompletedLesson);
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
+        //}
 
         [HttpPost("Enroll")]
         public async Task<ActionResult<MemberLessonDto>> Enroll([FromBody] MemberLessonEnrollDto Enroll)
