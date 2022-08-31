@@ -215,7 +215,7 @@ namespace StudioReservationAPP.Controllers
             {
 
                 var memberLessons = _context.MemberLessons.AsQueryable()
-                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true && ml.Lesson.StartDate >= DateTime.Now)
+                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true && ml.IsCompleted!= true && ml.Lesson.StartDate >= DateTime.Now)
                     .OrderBy(x => x.Lesson.StartDate);
                 //var memberlessons = _context.MemberLessons.AsQueryable().Where(ml => ml.MemberId == id && ml.isEnrolled == true && ml.Lesson.StartDate >= DateTime.Now);
                      
@@ -250,7 +250,7 @@ namespace StudioReservationAPP.Controllers
             {
 
                 var memberLessons = _context.MemberLessons
-                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true  && ml.Lesson.StartDate >= DateTime.Now)
+                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true && ml.IsCompleted != true && ml.Lesson.StartDate >= DateTime.Now)
                     .OrderBy(x => x.Lesson.StartDate)
                     .FirstOrDefault();
                
@@ -348,6 +348,26 @@ namespace StudioReservationAPP.Controllers
             }
         }
 
+        [HttpGet("GetLastCompletedLesson")]
+        public async Task<ActionResult<MemberLessonDto>> GetLastCompletedLesson(int memberId)
+        {
+            try
+            {
+                var LastCompletedLesson = _context.MemberLessons.Include(p=>p.Lesson).Where(x=> x.MemberId==memberId && x.IsEnrolled == true 
+                && x.IsCheckin == true && x.IsCompleted == true && x.Lesson.StartDate < DateTime.Now )
+                    .ToList().OrderBy(q=> q.Lesson.StartDate).FirstOrDefault();
+                if(LastCompletedLesson == null)
+                {
+                    return NotFound("Last Completed Lesson couldn't found");
+                }
+                return Ok(LastCompletedLesson);
+                
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
         [HttpPost("Enroll")]
         public async Task<ActionResult<MemberLessonDto>> Enroll([FromBody] MemberLessonEnrollDto Enroll)
