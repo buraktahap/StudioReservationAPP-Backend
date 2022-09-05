@@ -349,27 +349,41 @@ namespace StudioReservationAPP.Controllers
         }
 
         [HttpGet("GetCompletedLesson")]
-        public async Task<ActionResult<List<MemberLessonDto>>> GetCompletedLessons(int memberId)
+        public async Task<IOrderedEnumerable<MemberLesson>?> GetCompletedLessons(int memberId)
         {
             try
             {
                 var CompletedLessons = _context.MemberLessons.Include(p=>p.Lesson).Where(x=> x.MemberId==memberId && x.IsEnrolled == true 
                 && x.IsCheckin == true && x.Lesson.StartDate < DateTime.Now ).ToList()
-                    .OrderBy(q=> q.Lesson.StartDate);
+                    .OrderByDescending(q=> q.Lesson.StartDate);
                 CompletedLessons.ToList().ForEach(q => q.IsCompleted = true);
                 await _context.SaveChangesAsync();
-                if (CompletedLessons == null)
+                if (CompletedLessons.Count() == 0)
                 {
-                    return NotFound("Last Completed Lesson couldn't found");
+                    return null;
                 }
-                return Ok(CompletedLessons);
+                return CompletedLessons;
                 
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return null;
             }
         }
+        [HttpGet("GetCompletedLessonCount")]
+        public async Task<int?> GetCompletedLessonCount(int memberId)
+        {
+            try
+            {
+                var CompletedLesson = GetCompletedLessons(memberId);
+                var CompletedLessonCount = CompletedLesson.Result.Count();
+                return CompletedLessonCount;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        } 
         //TODO
         //[HttpGet("GetLastCompletedLesson")]
         //public async Task<ActionResult<MemberLessonDto>> GetLastCompletedLessons(int memberId)

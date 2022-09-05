@@ -1,6 +1,7 @@
 using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudioReservationAPP.Core.EFContext;
 using StudioReservationAPP.Core.Entities;
 using StudioReservationAPP.Models;
@@ -38,10 +39,10 @@ namespace StudioReservationAPP.Controllers
             [HttpGet("getById")]
             public async Task<ActionResult<MemberDto>> GetMemberById(int id)
             {
-                var Member = await _MemberService.GetMemberById(id);
-                var MemberResource = _mapper.Map<Member, MemberDto>(Member);
+                var Member =  _context.Members.Include(x=>x.Subscriptions).Where(q=>q.Id == id).FirstOrDefault();
+                //var MemberResource = _mapper.Map<Member, MemberDto>(Member);
 
-                return Ok(MemberResource);
+                return Ok(Member);
             }
 
 
