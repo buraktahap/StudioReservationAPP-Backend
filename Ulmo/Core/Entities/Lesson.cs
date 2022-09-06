@@ -9,6 +9,7 @@ namespace StudioReservationAPP.Core.Entities
         public Enums.LessonType LessonType { get; set; }
         public Enums.LessonLevel LessonLevel { get; set; }
         public string? Description { get; set; }
+        public double Rate { get; set; } = 0.0;
         public int EnrollQuota { get; set; } = 30;
         public int WaitingQueueQuota { get; set; } = 5;
         public DateTime StartDate { get; set; }
@@ -22,6 +23,8 @@ namespace StudioReservationAPP.Core.Entities
         public int EnrollCount { get; set; } = 0;
         public int WaitingQueueCount { get; set; } = 0;
         public virtual ICollection<WaitingQueue> WaitingQueues { get; set; }
+
+ 
 
         //public Queue<MemberLesson>? WaitingQueue { get; set; }
     }

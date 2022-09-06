@@ -9,6 +9,7 @@ namespace StudioReservationAPP.Core.Repositories.Base
         Task<MemberLesson> GetWithMemberLessonByIdAsync(int id);
         Task<MemberLesson> GetWithMemberLessonByMemberIdAsync(int id);
         Task<MemberLesson> GetWithMemberLessonByLessonIdAsync(int id);
+        Task<MemberLesson> GetWithMemberLessonByMemberIdAndLessonIdAsync(int memberId, int lessonId);
         Task<MemberLesson> GetWithMemberLessonByLessonNameAsync(String name);
     }
 

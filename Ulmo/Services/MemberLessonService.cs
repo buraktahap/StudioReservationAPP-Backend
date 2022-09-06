@@ -43,6 +43,10 @@ namespace StudioReservationAPP.Services
         {
             return await _unitOfWork.MemberLessons.GetWithMemberLessonByLessonIdAsync(id);
         }
+        public async Task<MemberLesson> GetMemberLessonByMemberIdAndLessonId(int memberId, int lessonId)
+        {
+            return await _unitOfWork.MemberLessons.GetWithMemberLessonByMemberIdAndLessonIdAsync(memberId, lessonId);
+        }
 
         public async Task<MemberLesson> GetMemberLessonByMemberId(int id)
         {

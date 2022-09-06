@@ -44,6 +44,12 @@ namespace StudioReservationAPP.Core.Repositories.Base
 .SingleOrDefaultAsync(a => a.Lesson.Id == id);
         }
 
+        public Task<MemberLesson> GetWithMemberLessonByMemberIdAndLessonIdAsync(int memberId, int lessonId)
+        {
+            return DbContext.MemberLessons
+.SingleOrDefaultAsync(a => a.Lesson.Id == lessonId && a.Member.Id == memberId);
+        }
+
 
         private DatabaseContext DbContext
         {

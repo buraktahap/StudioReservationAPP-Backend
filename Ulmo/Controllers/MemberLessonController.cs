@@ -383,7 +383,52 @@ namespace StudioReservationAPP.Controllers
             {
                 return null;
             }
-        } 
+        }
+
+        [HttpPost("PostLessonRate")]
+        public async Task<double?> PostLessonRate(int memberId, int lessonId, double rate)
+        {
+            try
+            {
+                var MemberLesson= _MemberLessonService.GetMemberLessonByMemberIdAndLessonId(memberId,lessonId).Result;
+                if (MemberLesson != null)
+                {
+                    MemberLesson.Rate = rate;
+                    var RatedMemberLessonCount = _context.MemberLessons.Where(x => x.LessonId == lessonId && x.Rate != null).Count();
+                    var Lesson = _lessonService.GetLessonById(lessonId).Result;
+                    Lesson.Rate = (Lesson.Rate * RatedMemberLessonCount + rate) / (RatedMemberLessonCount + 1);
+                    await _context.SaveChangesAsync();
+                    return Lesson.Rate;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        [HttpGet("GetUngradedMemberLessons")]
+        public async Task<ActionResult> GetUngradedMemberLessons(int memberId)
+        {
+            try
+            {
+                var UngradedMemberLessons = _context.MemberLessons.Include(q=>q.Lesson)
+                    .Where(x=>x.MemberId == memberId && x.IsCompleted==true && x.Rate == null)
+                    .ToList().OrderByDescending(q=>q.Lesson.StartDate);
+                if (UngradedMemberLessons is null)
+                {
+                    return NotFound("There is no UngradedLesson for this member");
+                }
+                return Ok(UngradedMemberLessons);
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         //TODO
         //[HttpGet("GetLastCompletedLesson")]
         //public async Task<ActionResult<MemberLessonDto>> GetLastCompletedLessons(int memberId)
@@ -392,7 +437,7 @@ namespace StudioReservationAPP.Controllers
         //    {
         //        var LastCompletedLessons = GetCompletedLessons(memberId);
         //        var LastCompletedLesson = LastCompletedLessons.Result.Value.FirstOrDefault();
-                
+
         //        if (LastCompletedLesson == null)
         //        {
         //            return NotFound("Last Completed Lesson couldn't found");

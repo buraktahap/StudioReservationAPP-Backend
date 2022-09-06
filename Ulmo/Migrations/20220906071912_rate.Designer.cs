@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudioReservationAPP.Core.EFContext;
 
@@ -11,9 +12,10 @@ using StudioReservationAPP.Core.EFContext;
 namespace StudioReservationAPP.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220906071912_rate")]
+    partial class rate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -190,7 +192,7 @@ namespace StudioReservationAPP.Migrations
                     b.Property<bool?>("IsEnrolled")
                         .HasColumnType("bit");
 
-                    b.Property<double?>("Rate")
+                    b.Property<double>("Rate")
                         .HasColumnType("float");
 
                     b.HasKey("MemberId", "LessonId");
