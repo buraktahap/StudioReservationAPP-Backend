@@ -2,7 +2,7 @@
 {
     public enum LessonLevel
     {
-        Beginner, Intermediate, Advance, All
+        Beginner=0, Intermediate, Advance, All
     }
 }
 

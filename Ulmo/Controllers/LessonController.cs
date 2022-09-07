@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudioReservationAPP.Core.EFContext;
 using StudioReservationAPP.Core.Entities;
+using StudioReservationAPP.Core.Entities.Enums;
 using StudioReservationAPP.Models;
 using StudioReservationAPP.Services;
 using StudioReservationAPP.Validator;
@@ -56,13 +57,13 @@ namespace StudioReservationAPP.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<LessonDto>> GetLessonsByBranchName(int memberId,string branchName)
+        public async Task<ActionResult<LessonDto>> GetLessonsByBranchNameAndLessonLevel(int memberId,string branchName, int lessonLevel)
         {
             try
             {   
                 var lessons = _context.Lessons
                     .Include(i => i.MemberLessons).ThenInclude(i => i.Member)
-                    .Where(m => m.Classes.Branch.Name == branchName && m.StartDate >= DateTime.Now)
+                    .Where(m => m.Classes.Branch.Name == branchName && (int)m.LessonLevel== lessonLevel && m.StartDate >= DateTime.Now)
                     .OrderBy(x => x.StartDate)
                     .Select(p => new LessonDto
                     {
@@ -78,9 +79,10 @@ namespace StudioReservationAPP.Controllers
                         EnrollCount = p.EnrollCount,
                         WaitingQueueCount = p.WaitingQueueCount,
                         WaitingQueueQuota = p.WaitingQueueQuota,
+                        Rate = p.Rate,
                     }).ToList();
                 
-                if (lessons.Count == 0)
+                if (lessons.Count() == 0)
                 {
                     return NotFound("There is no active lesson on thiz");
                 }

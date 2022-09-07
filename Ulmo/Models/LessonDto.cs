@@ -22,5 +22,7 @@ namespace StudioReservationAPP.Models
         public int ClassesId { get; set; }
         public ClassDto Classes { get; set; }
         public bool IsEnrolled { get; internal set; }
+        public double Rate { get; set; }
+
     }
 }
