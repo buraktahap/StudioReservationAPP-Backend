@@ -39,9 +39,9 @@ namespace StudioReservationAPP.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LessonDto>>> GetAllLessons()
         {
-            var Lessons =  _LessonService.GetAllLessons();
+            var Lessons = _LessonService.GetAllLessons();
             var LessonLocations = Lessons.ToList();
-            LessonLocations= (List<Lesson>)LessonLocations.OrderByDescending(x => x.StartDate);
+            LessonLocations = (List<Lesson>)LessonLocations.OrderByDescending(x => x.StartDate);
 
             return Ok(LessonLocations);
         }
@@ -49,31 +49,35 @@ namespace StudioReservationAPP.Controllers
         [HttpGet]
         public async Task<ActionResult<LessonDto>> GetLessonById(int id)
         {
-            var Lesson =  _context.Lessons.Include(x => x.Trainer)
-                .Include(q => q.Classes).ThenInclude(b=>b.Branch)
+            var Lesson = _context.Lessons.Include(x => x.Trainer)
+                .Include(q => q.Classes).ThenInclude(b => b.Branch)
                 .Where(l => l.Id == id).FirstOrDefault();
             var LessonResource = _mapper.Map<Lesson, LessonDto>(Lesson);
             return Ok(LessonResource);
         }
 
         [HttpPost]
-        public async Task<ActionResult<LessonDto>> GetLessonsByBranchNameAndLessonLevel(int memberId,string branchName, int lessonLevel)
+        public async Task<ActionResult<LessonDto>> GetLessonsByBranchNameAndLessonLevel(int memberId, string branchName, int lessonLevel)
         {
             try
-            {   
-                var lessons = _context.Lessons
+            {
+                List<LessonDto> lesson;
+
+                if (lessonLevel == 3)
+                {
+                     var lessons = _context.Lessons
                     .Include(i => i.MemberLessons).ThenInclude(i => i.Member)
-                    .Where(m => m.Classes.Branch.Name == branchName && (int)m.LessonLevel== lessonLevel && m.StartDate >= DateTime.Now)
+                    .Where(m => m.Classes.Branch.Name == branchName && m.StartDate >= DateTime.Now)
                     .OrderBy(x => x.StartDate)
                     .Select(p => new LessonDto
                     {
-                        IsEnrolled = p.MemberLessons.Any(r => r.MemberId == memberId&& r.IsEnrolled==true),
+                        IsEnrolled = p.MemberLessons.Any(r => r.MemberId == memberId && r.IsEnrolled == true),
                         Id = p.Id,
                         Name = p.Name,
                         Description = p.Description,
                         EstimatedTime = p.EstimatedTime,
                         LessonLevel = p.LessonLevel,
-                        LessonType = p.LessonType,  
+                        LessonType = p.LessonType,
                         EnrollQuota = p.EnrollQuota,
                         StartDate = p.StartDate,
                         EnrollCount = p.EnrollCount,
@@ -81,12 +85,39 @@ namespace StudioReservationAPP.Controllers
                         WaitingQueueQuota = p.WaitingQueueQuota,
                         Rate = p.Rate,
                     }).ToList();
-                
-                if (lessons.Count() == 0)
+                    lesson = lessons;
+                }
+                else
+                {
+                    var lessons = _context.Lessons
+                        .Include(i => i.MemberLessons).ThenInclude(i => i.Member)
+                        .Where(m => m.Classes.Branch.Name == branchName && (int)m.LessonLevel == lessonLevel && m.StartDate >= DateTime.Now)
+                        .OrderBy(x => x.StartDate)
+                        .Select(p => new LessonDto
+                        {
+                            IsEnrolled = p.MemberLessons.Any(r => r.MemberId == memberId && r.IsEnrolled == true),
+                            Id = p.Id,
+                            Name = p.Name,
+                            Description = p.Description,
+                            EstimatedTime = p.EstimatedTime,
+                            LessonLevel = p.LessonLevel,
+                            LessonType = p.LessonType,
+                            EnrollQuota = p.EnrollQuota,
+                            StartDate = p.StartDate,
+                            EnrollCount = p.EnrollCount,
+                            WaitingQueueCount = p.WaitingQueueCount,
+                            WaitingQueueQuota = p.WaitingQueueQuota,
+                            Rate = p.Rate,
+                        }).ToList();
+                    lesson = lessons;
+                }
+
+
+                if (lesson.Count == 0)
                 {
                     return NotFound("There is no active lesson on thiz");
                 }
-                return Ok(lessons);
+                return Ok(lesson);
 
             }
             catch (Exception e)

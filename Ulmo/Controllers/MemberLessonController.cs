@@ -308,14 +308,15 @@ namespace StudioReservationAPP.Controllers
                     if (lesson.WaitingQueueCount > 0)
                     {
                         var waitingQueueObject = _context.WaitingQueues.Where(x => x.LessonId == lessonToCancel.LessonId).OrderBy(q => q.QueueEnrollTime).FirstOrDefault();
-                        var memberLesson = new MemberLessonEnrollDto
+                        if (waitingQueueObject != null) {var memberLesson = new MemberLessonEnrollDto
                         {
                             LessonId = waitingQueueObject.LessonId.Value,
                             MemberId = waitingQueueObject.MemberId.Value
                         };
                         await Enroll(memberLesson);
                         await _WaitingQueueService.DeleteWaitingQueue(waitingQueueObject);
-                        lesson.WaitingQueueCount--;
+                        lesson.WaitingQueueCount--; }
+                        
                     }
                     await _context.SaveChangesAsync();
                     return Ok("Enroll Canceled");
