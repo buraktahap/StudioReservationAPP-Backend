@@ -13,7 +13,7 @@ namespace StudioReservationAPP.Models
         public int? LessonId { get; set; }
         public virtual Member Member { get; set; }
         public  virtual LessonDto Lesson { get; set; }
-
-
+        public double? Rate { get; internal set; }
+        public string ClassName { get; internal set; }
     }
 }
