@@ -18,6 +18,7 @@ namespace StudioReservationAPP.Controllers
     {
         private readonly IMemberLessonService _MemberLessonService;
         private readonly ILessonService _lessonService;
+        private readonly ITrainerService _trainerService;
         private readonly IMapper _mapper;
         private readonly IWaitingQueueService _WaitingQueueService;
         private readonly IMemberService _memberService;
@@ -25,9 +26,10 @@ namespace StudioReservationAPP.Controllers
 
         public int MemberLessons { get; private set; }
 
-        public MemberLessonsController(IMemberLessonService MemberLessonService,IMemberService MemberService,ILessonService LessonService, IMapper mapper, DatabaseContext context, IWaitingQueueService waitingQueueService)
+        public MemberLessonsController(ITrainerService TrainerService, IMemberLessonService MemberLessonService,IMemberService MemberService,ILessonService LessonService, IMapper mapper, DatabaseContext context, IWaitingQueueService waitingQueueService)
         {
             _memberService = MemberService;
+            _trainerService = TrainerService;
             _mapper = mapper;
             _MemberLessonService = MemberLessonService;
             _lessonService = LessonService;
@@ -209,16 +211,24 @@ namespace StudioReservationAPP.Controllers
         }
 
         [HttpGet("ReservationList")]
-        public async Task<ActionResult<MemberLessonDto>> ReservationList(int id)
+        public async Task<ActionResult<MemberLessonDto>> ReservationList(int id, DateTime? selectedDay)
         {
             try
             {
-
-                var memberLessons = _context.MemberLessons.AsQueryable()
+                IOrderedQueryable<MemberLesson> memberLessons;
+                if (selectedDay == null) { 
+                      memberLessons = _context.MemberLessons.AsQueryable()
                     .Where(ml => ml.MemberId == id && ml.IsEnrolled == true && ml.IsCompleted!= true && ml.Lesson.StartDate >= DateTime.Now)
-                    .OrderBy(x => x.Lesson.StartDate);
+                    .OrderBy(x => x.Lesson.StartDate);}
+                       
                 //var memberlessons = _context.MemberLessons.AsQueryable().Where(ml => ml.MemberId == id && ml.isEnrolled == true && ml.Lesson.StartDate >= DateTime.Now);
-                     
+                else
+                {
+                     memberLessons = _context.MemberLessons.AsQueryable()
+                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true && ml.IsCompleted != true && ml.Lesson.StartDate >= DateTime.Now && ml.Lesson.StartDate == selectedDay)
+                    .OrderBy(x => x.Lesson.StartDate);
+                }
+             
 
                 
                 if (memberLessons == null)
@@ -230,6 +240,9 @@ namespace StudioReservationAPP.Controllers
                 {
                     var lesson = await _lessonService.GetLessonById(i.LessonId);
                     i.Lesson = lesson;
+                    var trainer = await _trainerService.GetTrainerById(i.Lesson.TrainerId);
+                    var TrainerResource = _mapper.Map<Trainer, TrainerDto>(trainer);
+                    i.Lesson.Trainer = _mapper.Map<TrainerDto, Trainer>(TrainerResource);
                 }
                     return Ok(memberLessons);
                 }
