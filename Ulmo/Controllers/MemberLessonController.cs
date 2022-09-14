@@ -225,7 +225,7 @@ namespace StudioReservationAPP.Controllers
                 else
                 {
                      memberLessons = _context.MemberLessons.AsQueryable()
-                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true && ml.IsCompleted != true && ml.Lesson.StartDate >= DateTime.Now && ml.Lesson.StartDate == selectedDay)
+                    .Where(ml => ml.MemberId == id && ml.IsEnrolled == true && ml.IsCompleted != true && ml.Lesson.StartDate >= DateTime.Now && ml.Lesson.StartDate.DayOfYear == selectedDay.Value.DayOfYear)
                     .OrderBy(x => x.Lesson.StartDate);
                 }
              
